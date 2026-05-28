@@ -1,0 +1,396 @@
+{
+  "base_url": "https://admin.theworkmatch.com",
+  "auth": {
+    "type": "Bearer",
+    "header": "Authorization",
+    "note": "Token obtained from POST /api/auth/login. Required for all /admin/api/* routes."
+  },
+  "endpoints": [
+    {
+      "group": "Auth",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "auth": false,
+      "body": {
+        "type": "multipart/form-data",
+        "fields": {
+          "username": "string (required)",
+          "password": "string (required)"
+        }
+      },
+      "response": {
+        "200": { "token": "string", "admin": { "id": "string", "email": "string" } },
+        "401": "Invalid credentials"
+      }
+    },
+    {
+      "group": "Public Forms",
+      "method": "POST",
+      "path": "/api/applications/submit",
+      "auth": false,
+      "body": {
+        "type": "multipart/form-data",
+        "fields": {
+          "full_name": "string (required)",
+          "email": "string (required)",
+          "phone": "string (required)",
+          "position": "string (required)",
+          "consent": "boolean (required, must be true)",
+          "cv": "file (optional, PDF/DOC)"
+        }
+      },
+      "response": {
+        "200": { "message": "Application submitted successfully" },
+        "400": "Consent is required"
+      }
+    },
+    {
+      "group": "Public Forms",
+      "method": "POST",
+      "path": "/api/hire-talent/submit",
+      "auth": false,
+      "body": {
+        "type": "multipart/form-data",
+        "fields": {
+          "full_name": "string (required)",
+          "company_name": "string (required)",
+          "email": "string (required)",
+          "phone": "string (required)",
+          "inquiry": "string (required)",
+          "consent": "boolean (required, must be true)"
+        }
+      },
+      "response": {
+        "200": { "message": "Consultation request submitted successfully" },
+        "400": "Consent is required"
+      }
+    },
+    {
+      "group": "Public Jobs",
+      "method": "GET",
+      "path": "/api/jobs",
+      "auth": false,
+      "response": {
+        "200": [
+          {
+            "id": "string",
+            "job_title": "string",
+            "location": "string",
+            "type": "Full Time | Contract",
+            "experience": "string",
+            "openings": "integer",
+            "job_description": "string",
+            "primary_skills": "string",
+            "secondary_skills": "string",
+            "created_at": "string"
+          }
+        ]
+      }
+    },
+    {
+      "group": "Public Jobs",
+      "method": "GET",
+      "path": "/api/jobs/{job_id}",
+      "auth": false,
+      "response": {
+        "200": {
+          "id": "string",
+          "job_title": "string",
+          "location": "string",
+          "type": "Full Time | Contract",
+          "experience": "string",
+          "openings": "integer",
+          "job_description": "string",
+          "primary_skills": "string",
+          "secondary_skills": "string",
+          "created_at": "string"
+        },
+        "404": "Job not found"
+      }
+    },
+    {
+      "group": "Public Blogs",
+      "method": "GET",
+      "path": "/api/blogs",
+      "auth": false,
+      "query_params": {
+        "published_only": "boolean (default: true)"
+      },
+      "response": {
+        "200": [
+          {
+            "id": "string",
+            "title": "string",
+            "slug": "string",
+            "excerpt": "string",
+            "author": "string",
+            "tags": "string",
+            "published": "boolean",
+            "banner_url": "string",
+            "created_at": "string"
+          }
+        ]
+      }
+    },
+    {
+      "group": "Public Blogs",
+      "method": "GET",
+      "path": "/api/blogs/{blog_id}",
+      "auth": false,
+      "response": {
+        "200": {
+          "id": "string",
+          "title": "string",
+          "slug": "string",
+          "excerpt": "string",
+          "content": "string",
+          "author": "string",
+          "tags": "string",
+          "published": "boolean",
+          "banner_url": "string",
+          "created_at": "string"
+        },
+        "404": "Blog not found"
+      }
+    },
+    {
+      "group": "Admin Stats",
+      "method": "GET",
+      "path": "/admin/api/stats",
+      "auth": true,
+      "response": {
+        "200": {
+          "total": "integer",
+          "totalHire": "integer",
+          "byPosition": [{ "position": "string", "count": "integer" }],
+          "byMonth": [{ "month": "YYYY-MM", "count": "integer" }],
+          "byMonthHire": [{ "month": "YYYY-MM", "count": "integer" }]
+        }
+      }
+    },
+    {
+      "group": "Admin Applications",
+      "method": "GET",
+      "path": "/admin/api/applications",
+      "auth": true,
+      "query_params": {
+        "position": "string (optional)",
+        "startDate": "YYYY-MM-DD (optional)",
+        "endDate": "YYYY-MM-DD (optional)",
+        "search": "string (optional, searches name/email/phone)"
+      },
+      "response": {
+        "200": [
+          {
+            "id": "string",
+            "full_name": "string",
+            "email": "string",
+            "phone": "string",
+            "position": "string",
+            "cv_filename": "string",
+            "cv_url": "string",
+            "created_at": "string"
+          }
+        ]
+      }
+    },
+    {
+      "group": "Admin Applications",
+      "method": "DELETE",
+      "path": "/admin/api/applications/{rec_id}",
+      "auth": true,
+      "response": {
+        "200": { "message": "Deleted" },
+        "404": "Not found"
+      }
+    },
+    {
+      "group": "Admin Hire Talent",
+      "method": "GET",
+      "path": "/admin/api/hire-talent",
+      "auth": true,
+      "query_params": {
+        "search": "string (optional, searches name/company/email)",
+        "startDate": "YYYY-MM-DD (optional)",
+        "endDate": "YYYY-MM-DD (optional)"
+      },
+      "response": {
+        "200": [
+          {
+            "id": "string",
+            "full_name": "string",
+            "company_name": "string",
+            "email": "string",
+            "phone": "string",
+            "inquiry": "string",
+            "created_at": "string"
+          }
+        ]
+      }
+    },
+    {
+      "group": "Admin Hire Talent",
+      "method": "DELETE",
+      "path": "/admin/api/hire-talent/{rec_id}",
+      "auth": true,
+      "response": {
+        "200": { "message": "Deleted" },
+        "404": "Not found"
+      }
+    },
+    {
+      "group": "Admin Jobs",
+      "method": "GET",
+      "path": "/admin/api/jobs",
+      "auth": true,
+      "response": {
+        "200": "Array of job objects"
+      }
+    },
+    {
+      "group": "Admin Jobs",
+      "method": "POST",
+      "path": "/admin/api/jobs",
+      "auth": true,
+      "body": {
+        "type": "multipart/form-data",
+        "fields": {
+          "job_title": "string (required)",
+          "location": "string (required)",
+          "type": "Full Time | Contract (required)",
+          "experience": "string (required)",
+          "openings": "integer (required)",
+          "job_description": "string (required)",
+          "primary_skills": "string (required)",
+          "secondary_skills": "string (optional)"
+        }
+      },
+      "response": {
+        "200": { "message": "Job created", "id": "string" },
+        "400": "Invalid type value"
+      }
+    },
+    {
+      "group": "Admin Jobs",
+      "method": "PUT",
+      "path": "/admin/api/jobs/{job_id}",
+      "auth": true,
+      "body": {
+        "type": "multipart/form-data",
+        "fields": {
+          "job_title": "string (required)",
+          "location": "string (required)",
+          "type": "Full Time | Contract (required)",
+          "experience": "string (required)",
+          "openings": "integer (required)",
+          "job_description": "string (required)",
+          "primary_skills": "string (required)",
+          "secondary_skills": "string (optional)"
+        }
+      },
+      "response": {
+        "200": { "message": "Job updated" },
+        "404": "Job not found"
+      }
+    },
+    {
+      "group": "Admin Jobs",
+      "method": "DELETE",
+      "path": "/admin/api/jobs/{job_id}",
+      "auth": true,
+      "response": {
+        "200": { "message": "Job deleted" },
+        "404": "Job not found"
+      }
+    },
+    {
+      "group": "Admin Blogs",
+      "method": "GET",
+      "path": "/admin/api/blogs",
+      "auth": true,
+      "response": {
+        "200": "Array of blog objects (includes content field)"
+      }
+    },
+    {
+      "group": "Admin Blogs",
+      "method": "POST",
+      "path": "/admin/api/blogs",
+      "auth": true,
+      "body": {
+        "type": "multipart/form-data",
+        "fields": {
+          "title": "string (required)",
+          "slug": "string (required)",
+          "excerpt": "string (optional)",
+          "content": "string (required)",
+          "author": "string (optional)",
+          "tags": "string (optional, comma-separated)",
+          "published": "boolean (optional, default false)",
+          "banner": "file (optional, image)"
+        }
+      },
+      "response": {
+        "200": { "message": "Blog created", "id": "string" }
+      }
+    },
+    {
+      "group": "Admin Blogs",
+      "method": "PUT",
+      "path": "/admin/api/blogs/{blog_id}",
+      "auth": true,
+      "body": {
+        "type": "multipart/form-data",
+        "fields": {
+          "title": "string (required)",
+          "slug": "string (required)",
+          "excerpt": "string (optional)",
+          "content": "string (required)",
+          "author": "string (optional)",
+          "tags": "string (optional)",
+          "published": "boolean (optional)",
+          "banner": "file (optional)"
+        }
+      },
+      "response": {
+        "200": { "message": "Blog updated" },
+        "404": "Blog not found"
+      }
+    },
+    {
+      "group": "Admin Blogs",
+      "method": "DELETE",
+      "path": "/admin/api/blogs/{blog_id}",
+      "auth": true,
+      "response": {
+        "200": { "message": "Blog deleted" },
+        "404": "Blog not found"
+      }
+    },
+    {
+      "group": "Admin Exports",
+      "method": "GET",
+      "path": "/admin/api/export/excel",
+      "auth": true,
+      "response": {
+        "200": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet — applications.xlsx"
+      }
+    },
+    {
+      "group": "Admin Exports",
+      "method": "GET",
+      "path": "/admin/api/export/pdf",
+      "auth": true,
+      "response": {
+        "200": "application/pdf — applications.pdf"
+      }
+    }
+  ],
+  "errors": {
+    "400": "Bad request / validation error",
+    "401": "Missing or invalid token",
+    "404": "Record not found",
+    "422": "Missing required fields",
+    "500": "Server error"
+  }
+}

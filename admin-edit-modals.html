@@ -1,0 +1,173 @@
+<!-- Application Edit Modal -->
+<div class="modal-bg" id="appModal">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle" id="appModalTitle">Edit Application</span><button class="mclose" onclick="closeAppModal()">×</button></div>
+    <div class="mbody">
+      <div class="fr">
+        <div class="fg2"><label class="flabel">Full Name *</label><input class="fc" id="aName" placeholder="John Doe"></div>
+        <div class="fg2"><label class="flabel">Email *</label><input class="fc" id="aEmail" type="email" placeholder="john@email.com"></div>
+      </div>
+      <div class="fr">
+        <div class="fg2"><label class="flabel">Phone *</label><input class="fc" id="aPhone" placeholder="+91 98765 43210"></div>
+        <div class="fg2"><label class="flabel">Position *</label><input class="fc" id="aPosition" placeholder="Software Engineer"></div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn" onclick="closeAppModal()">Cancel</button>
+      <button class="btn btn-p" id="btnSaveApp" onclick="saveApplication()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hire Talent Edit Modal -->
+<div class="modal-bg" id="hireModal">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle" id="hireModalTitle">Edit Hire Request</span><button class="mclose" onclick="closeHireModal()">×</button></div>
+    <div class="mbody">
+      <div class="fr">
+        <div class="fg2"><label class="flabel">Full Name *</label><input class="fc" id="hName" placeholder="John Doe"></div>
+        <div class="fg2"><label class="flabel">Company Name *</label><input class="fc" id="hCompany" placeholder="Acme Inc."></div>
+      </div>
+      <div class="fr">
+        <div class="fg2"><label class="flabel">Email *</label><input class="fc" id="hEmail" type="email" placeholder="john@company.com"></div>
+        <div class="fg2"><label class="flabel">Phone *</label><input class="fc" id="hPhone" placeholder="+91 98765 43210"></div>
+      </div>
+      <div class="fg2" style="margin-top:.875rem"><label class="flabel">Inquiry *</label><textarea class="fc" id="hInquiry" rows="4" placeholder="Hiring needs..."></textarea></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn" onclick="closeHireModal()">Cancel</button>
+      <button class="btn btn-p" id="btnSaveHire" onclick="saveHireRequest()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Application CRUD ──────────────────────────────────────────────────────────
+let editAppId = null;
+
+function openAppModal(app) {
+  editAppId = app?.id || null;
+  document.getElementById('appModalTitle').textContent = 'Edit Application';
+  document.getElementById('aName').value = app?.full_name || '';
+  document.getElementById('aEmail').value = app?.email || '';
+  document.getElementById('aPhone').value = app?.phone || '';
+  document.getElementById('aPosition').value = app?.position || '';
+  document.getElementById('appModal').classList.add('on');
+  setTimeout(() => document.getElementById('aName').focus(), 50);
+}
+
+function closeAppModal() {
+  document.getElementById('appModal').classList.remove('on');
+}
+
+function editApplication(id) {
+  openAppModal(allCareers.find(a => a.id === id));
+}
+
+async function saveApplication() {
+  const btn = document.getElementById('btnSaveApp');
+  const name = document.getElementById('aName').value.trim();
+  const email = document.getElementById('aEmail').value.trim();
+  const phone = document.getElementById('aPhone').value.trim();
+  const position = document.getElementById('aPosition').value.trim();
+  
+  if (!name || !email || !phone || !position) {
+    toast('Fill in all required fields', 'err');
+    return;
+  }
+  
+  btn.classList.add('busy');
+  btn.textContent = 'Saving…';
+  
+  const fd = new FormData();
+  fd.append('full_name', name);
+  fd.append('email', email);
+  fd.append('phone', phone);
+  fd.append('position', position);
+  
+  try {
+    const r = await api(`/admin/api/applications/${editAppId}`, { method: 'PUT', body: fd });
+    if (!r.ok) throw new Error(await r.text());
+    
+    const i = allCareers.findIndex(a => a.id === editAppId);
+    if (i > -1) {
+      allCareers[i] = { ...allCareers[i], full_name: name, email, phone, position };
+    }
+    
+    renderCareers(allCareers);
+    closeAppModal();
+    toast('Application updated', 'ok');
+  } catch (e) {
+    toast('Failed to save: ' + e.message, 'err');
+  } finally {
+    btn.classList.remove('busy');
+    btn.textContent = 'Save Changes';
+  }
+}
+
+// ── Hire Talent CRUD ──────────────────────────────────────────────────────────
+let editHireId = null;
+
+function openHireModal(hire) {
+  editHireId = hire?.id || null;
+  document.getElementById('hireModalTitle').textContent = 'Edit Hire Request';
+  document.getElementById('hName').value = hire?.full_name || '';
+  document.getElementById('hCompany').value = hire?.company_name || '';
+  document.getElementById('hEmail').value = hire?.email || '';
+  document.getElementById('hPhone').value = hire?.phone || '';
+  document.getElementById('hInquiry').value = hire?.inquiry || '';
+  document.getElementById('hireModal').classList.add('on');
+  setTimeout(() => document.getElementById('hName').focus(), 50);
+}
+
+function closeHireModal() {
+  document.getElementById('hireModal').classList.remove('on');
+}
+
+function editHireRequest(id) {
+  openHireModal(allHire.find(h => h.id === id));
+}
+
+async function saveHireRequest() {
+  const btn = document.getElementById('btnSaveHire');
+  const name = document.getElementById('hName').value.trim();
+  const company = document.getElementById('hCompany').value.trim();
+  const email = document.getElementById('hEmail').value.trim();
+  const phone = document.getElementById('hPhone').value.trim();
+  const inquiry = document.getElementById('hInquiry').value.trim();
+  
+  if (!name || !company || !email || !phone || !inquiry) {
+    toast('Fill in all required fields', 'err');
+    return;
+  }
+  
+  btn.classList.add('busy');
+  btn.textContent = 'Saving…';
+  
+  const fd = new FormData();
+  fd.append('full_name', name);
+  fd.append('company_name', company);
+  fd.append('email', email);
+  fd.append('phone', phone);
+  fd.append('inquiry', inquiry);
+  
+  try {
+    const r = await api(`/admin/api/hire-talent/${editHireId}`, { method: 'PUT', body: fd });
+    if (!r.ok) throw new Error(await r.text());
+    
+    const i = allHire.findIndex(h => h.id === editHireId);
+    if (i > -1) {
+      allHire[i] = { ...allHire[i], full_name: name, company_name: company, email, phone, inquiry };
+    }
+    
+    renderHire(allHire);
+    closeHireModal();
+    toast('Hire request updated', 'ok');
+  } catch (e) {
+    toast('Failed to save: ' + e.message, 'err');
+  } finally {
+    btn.classList.remove('busy');
+    btn.textContent = 'Save Changes';
+  }
+}
+</script>

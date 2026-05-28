@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Careers - The Work Match</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #1e40af;
+      --primary-green: #059669;
+      --light-blue: #dbeafe;
+      --light-green: #d1fae5;
+      --dark-blue: #1e3a8a;
+      --dark-green: #047857;
+      --gradient: linear-gradient(135deg, #1e40af 0%, #059669 100%);
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f9fafb;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-light);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      right: -20%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(30, 64, 175, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -30%;
+      left: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(5, 150, 105, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+      animation: float 15s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, 30px) scale(1.1); }
+    }
+    
+    .header {
+      background: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: relative;
+      z-index: 10;
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 24px;
+      font-family: 'Outfit', sans-serif;
+    }
+    
+    .logo-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .logo-text p {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: -2px;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      border: 1px solid rgba(30, 64, 175, 0.08);
+    }
+    
+    .card-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    .card-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-header p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.75rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 0.9rem;
+      letter-spacing: -0.01em;
+    }
+    
+    input[type="text"], 
+    input[type="email"], 
+    input[type="tel"] {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s ease;
+      background: white;
+    }
+    
+    input[type="text"]:focus, 
+    input[type="email"]:focus, 
+    input[type="tel"]:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      left: -9999px;
+    }
+    
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1.25rem;
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg-light);
+      color: var(--text-light);
+      font-weight: 500;
+    }
+    
+    .file-input-label:hover {
+      border-color: var(--primary-blue);
+      background: var(--light-blue);
+      color: var(--primary-blue);
+    }
+    
+    .file-input-label svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .file-name {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--primary-green);
+      font-weight: 500;
+    }
+    
+    .consent {
+      display: flex;
+      align-items: start;
+      gap: 0.75rem;
+      padding: 1.25rem;
+      background: var(--light-blue);
+      border-radius: 12px;
+      border: 1px solid rgba(30, 64, 175, 0.15);
+    }
+    
+    .consent input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: var(--primary-blue);
+    }
+    
+    .consent label {
+      font-weight: 400;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--text-dark);
+      margin: 0;
+    }
+    
+    button {
+      width: 100%;
+      padding: 1rem;
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0.02em;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+      margin-top: 1rem;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(30, 64, 175, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .message {
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      border-radius: 12px;
+      display: none;
+      font-weight: 500;
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .success {
+      background: var(--light-green);
+      color: var(--dark-green);
+      border: 1px solid var(--primary-green);
+    }
+    
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+    }
+    
+    @media (max-width: 768px) {
+      .header { padding: 1rem 1.5rem; }
+      .logo-text h1 { font-size: 1.25rem; }
+      .container { margin: 2rem auto; padding: 0 1rem; }
+      .card { padding: 2rem 1.5rem; border-radius: 20px; }
+      .card-header h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">W</div>
+        <div class="logo-text">
+          <h1>The Work Match</h1>
+          <p>Chennai - 600 002</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>Join Our Team</h2>
+        <p>Fill out the form below to apply for your dream position</p>
+      </div>
+      
+      <div id="message" class="message"></div>
+      
+      <form id="applicationForm">
+        <div class="form-group">
+          <label for="fullName">Full Name *</label>
+          <input type="text" id="fullName" name="full_name" placeholder="Enter your full name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input type="tel" id="phone" name="phone" placeholder="+91 XXXXX XXXXX" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="position">Position of Interest *</label>
+          <input type="text" id="position" name="position" placeholder="e.g., Software Engineer, Marketing Manager" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Upload CV/Resume *</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
+            <label for="cv" class="file-input-label">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              Choose File (PDF, DOC, DOCX)
+            </label>
+          </div>
+          <div id="fileName" class="file-name"></div>
+        </div>
+        
+        <div class="form-group consent">
+          <input type="checkbox" id="consent" name="consent" required>
+          <label for="consent">By using this form you agree with the storage and handling of your data by this website. *</label>
+        </div>
+        
+        <button type="submit">Submit Application</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('cv').addEventListener('change', function(e) {
+      const fileName = e.target.files[0]?.name;
+      const fileNameDiv = document.getElementById('fileName');
+      if (fileName) {
+        fileNameDiv.textContent = `✓ ${fileName}`;
+        fileNameDiv.style.display = 'block';
+      }
+    });
+
+    document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      formData.set('consent', document.getElementById('consent').checked);
+
+      const messageDiv = document.getElementById('message');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.textContent = 'Submitting...';
+      submitBtn.disabled = true;
+      
+      try {
+        const response = await fetch('/api/applications/submit', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageDiv.className = 'message success';
+          messageDiv.textContent = '✓ Application submitted successfully! We will contact you soon.';
+          messageDiv.style.display = 'block';
+          e.target.reset();
+          document.getElementById('fileName').textContent = '';
+          setTimeout(() => messageDiv.style.display = 'none', 5000);
+        } else {
+          throw new Error(data.error || 'Submission failed');
+        }
+      } catch (error) {
+        messageDiv.className = 'message error';
+        messageDiv.textContent = '✗ ' + error.message;
+        messageDiv.style.display = 'block';
+      } finally {
+        submitBtn.textContent = 'Submit Application';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
