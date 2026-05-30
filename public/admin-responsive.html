@@ -5,9 +5,31 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Dashboard — Work Match</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--p:#0f62fe;--g:#24a148;--r:#da1e28;--bg:#f4f4f4;--card:#fff;--border:#e0e0e0;--t1:#161616;--t2:#525252;--t3:#8d8d8d;--sw:256px}
+/* Quill Custom Styles */
+.ql-toolbar.ql-snow { border: 1px solid var(--border) !important; border-radius: 8px 8px 0 0 !important; background: #fafafa !important; }
+.ql-container.ql-snow { border: 1px solid var(--border) !important; border-radius: 0 0 8px 8px !important; background: #fff !important; font-family: 'IBM Plex Sans', sans-serif !important; font-size: 16px !important; }
+.ql-editor { min-height: 500px !important; padding: 2.5rem !important; line-height: 1.8 !important; }
+.blog-modal-wide { max-width: 95% !important; width: 1400px !important; }
+#blogPreviewArea { display: none; border: 1px solid var(--border); border-radius: 8px; padding: 2.5rem; background: #fff; overflow-y: auto; height: 620px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); }
+#blogPreviewArea.on { display: block; }
+.rt-preview h1 { font-size: 2.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem; color: var(--t1); }
+.rt-preview h2 { font-size: 2rem; font-weight: 600; margin: 2.5rem 0 1rem; }
+.rt-preview p { margin-bottom: 1.75rem; font-size: 18px; line-height: 1.8; color: var(--t2); }
+.rt-preview img { max-width: 100%; height: auto; border-radius: 12px; margin: 2rem 0; box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+.rt-preview iframe { width: 100%; aspect-ratio: 16/9; border-radius: 12px; margin: 2rem 0; }
+
+.modal-body-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+@media(min-width:1200px) {
+  .preview-active .modal-body-grid { grid-template-columns: 1fr 1fr; }
+  .preview-active #blogPreviewArea { display: block; }
+}
+
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;overflow-x:hidden}
 .app{display:flex;min-height:100vh}
@@ -97,6 +119,23 @@ tr.removing{opacity:0;transform:translateX(20px);transition:all .25s}
 .fc{width:100%;padding:.55rem .75rem;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;background:#fff;color:var(--t1)}
 .fc:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 2px rgba(15,98,254,.12)}
 textarea.fc{resize:vertical;min-height:90px}
+.rt-wrap{border:1px solid var(--border);border-radius:6px;background:#fff;overflow:hidden}
+.rt-wrap:focus-within{border-color:var(--p);box-shadow:0 0 0 2px rgba(15,98,254,.12)}
+.rt-toolbar{display:flex;flex-wrap:wrap;gap:.25rem;padding:.45rem;border-bottom:1px solid var(--border);background:#fafafa}
+.rt-btn,.rt-select{border:1px solid var(--border);background:#fff;color:var(--t1);border-radius:5px;height:30px;font:600 12px/1 inherit;cursor:pointer}
+.rt-btn{min-width:30px;padding:0 .55rem}
+.rt-btn:hover,.rt-select:hover{background:#e8e8e8}
+.rt-select{padding:0 .45rem;font-weight:500}
+.rt-editor{min-height:220px;padding:.75rem;font-size:14px;line-height:1.65;outline:none;overflow-y:auto}
+.rt-editor:empty:before{content:attr(data-placeholder);color:var(--t3)}
+.rt-editor h2{font-size:1.25rem;margin:.6rem 0 .35rem}
+.rt-editor h3{font-size:1.05rem;margin:.5rem 0 .3rem}
+.rt-editor p{margin:.45rem 0}
+.rt-editor ul,.rt-editor ol{padding-left:1.35rem;margin:.5rem 0}
+.rt-editor blockquote{border-left:3px solid var(--p);margin:.65rem 0;padding:.25rem .75rem;color:var(--t2);background:#f4f4f4}
+.rt-editor a{color:var(--p)}
+.rt-editor img{max-width:100%;height:auto}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;padding:1.25rem}
 .blog-card{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff;transition:box-shadow .2s,opacity .25s,transform .25s}
 .blog-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
@@ -270,27 +309,46 @@ textarea.fc{resize:vertical;min-height:90px}
 
 <!-- Blog Modal -->
 <div class="modal-bg" id="blogModal">
-  <div class="modal" style="max-width:700px">
-    <div class="mhdr"><span class="mtitle" id="blogModalTitle">Add Blog Post</span><button class="mclose" onclick="closeBlogModal()">×</button></div>
-    <div class="mbody">
-      <div class="fr">
-        <div class="fg2"><label class="flabel">Title *</label><input class="fc" id="bTitle" placeholder="Blog post title"></div>
-        <div class="fg2"><label class="flabel">Slug *</label><input class="fc" id="bSlug" placeholder="blog-post-slug"></div>
+  <div class="modal blog-modal-wide">
+    <div class="mhdr">
+      <span class="mtitle" id="blogModalTitle">Add Blog Post</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-sm" id="btnBlogPreview" onclick="toggleBlogPreview()">Live Preview</button>
+        <button class="mclose" onclick="closeBlogModal()">×</button>
       </div>
-      <div class="fr">
-        <div class="fg2"><label class="flabel">Author</label><input class="fc" id="bAuthor" placeholder="Author name"></div>
-        <div class="fg2"><label class="flabel">Tags</label><input class="fc" id="bTags" placeholder="tech, hiring, remote"></div>
-      </div>
-      <div class="fg2"><label class="flabel">Excerpt</label><textarea class="fc" id="bExcerpt" rows="2" placeholder="Short summary…"></textarea></div>
-      <div class="fg2" style="margin-top:.875rem"><label class="flabel">Content *</label><textarea class="fc" id="bContent" rows="7" placeholder="Full blog post content…"></textarea></div>
-      <div class="fg2" style="margin-top:.875rem">
-        <label class="flabel">Banner Image</label>
-        <input type="file" class="fc" id="bBanner" accept="image/*" onchange="previewBanner(this)">
+    </div>
+    <div class="mbody modal-body-grid" id="blogModalBody">
+      <div id="blogEditorSide">
+        <div class="fr">
+          <div class="fg2"><label class="flabel">Title *</label><input class="fc" id="bTitle" placeholder="Blog post title"></div>
+          <div class="fg2"><label class="flabel">Slug *</label><input class="fc" id="bSlug" placeholder="blog-post-slug"></div>
+        </div>
+        <div class="fr">
+          <div class="fg2"><label class="flabel">Author</label><input class="fc" id="bAuthor" placeholder="Author name"></div>
+          <div class="fg2"><label class="flabel">Tags</label><input class="fc" id="bTags" placeholder="tech, hiring, remote"></div>
+        </div>
+        <div class="fg2"><label class="flabel">Excerpt</label><textarea class="fc" id="bExcerpt" rows="2" placeholder="Short summary…"></textarea></div>
+        <div class="fg2" style="margin-top:.875rem" id="bContentEditorWrap">
+          <label class="flabel">Content *</label>
+          <div id="bContentEditor" style="background:#f9f9f9;padding:1rem;border:1px solid #ddd;border-radius:4px;color:#888">Loading editor...</div>
+        </div>
+        <div class="fr" style="margin-top:.875rem">
+           <div class="fg2">
+            <label class="flabel">Banner Image</label>
+            <input type="file" class="fc" id="bBanner" accept="image/*" onchange="previewBanner(this)">
+          </div>
+          <div class="fg2" style="display:flex;align-items:center;gap:.5rem;padding-top:1.5rem">
+            <input type="checkbox" id="bPublished" style="width:16px;height:16px;accent-color:var(--p)">
+            <label for="bPublished" style="font-size:13px;font-weight:500;cursor:pointer">Publish immediately</label>
+          </div>
+        </div>
         <img class="img-preview" id="bBannerPreview" alt="Banner preview">
       </div>
-      <div class="fg2" style="margin-top:.875rem;display:flex;align-items:center;gap:.5rem">
-        <input type="checkbox" id="bPublished" style="width:16px;height:16px;accent-color:var(--p)">
-        <label for="bPublished" style="font-size:13px;font-weight:500;cursor:pointer">Publish immediately</label>
+      
+      <div id="blogPreviewArea" class="rt-editor">
+        <h1 id="pvTitle" style="margin-bottom:.5rem"></h1>
+        <div id="pvMeta" style="font-size:12px;color:var(--t3);margin-bottom:1.5rem"></div>
+        <div id="pvContent"></div>
       </div>
     </div>
     <div class="mfoot">
@@ -565,7 +623,46 @@ async function deleteJob(id) {
 }
 
 // ── Blog CRUD ─────────────────────────────────────────────────────────────────
-function openBlogModal(blog) {
+let quill;
+
+function initQuill(html='') {
+  if (quill) {
+    quill.root.innerHTML = html;
+    return;
+  }
+  quill = new Quill('#bContentEditor', {
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, false] }],
+        ['bold', 'italic', 'underline'],
+        ['link', 'image'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['clean']
+      ]
+    }
+  });
+  quill.root.innerHTML = html;
+  quill.on('text-change', function() {
+    if (document.getElementById('blogModal').classList.contains('preview-active')) updatePreview();
+  });
+}
+
+function toggleBlogPreview() {
+  const modal = document.getElementById('blogModal');
+  modal.classList.toggle('preview-active');
+  const btn = document.getElementById('btnBlogPreview');
+  btn.textContent = modal.classList.contains('preview-active') ? 'Edit Mode' : 'Live Preview';
+  if (modal.classList.contains('preview-active')) updatePreview();
+}
+
+function updatePreview() {
+  document.getElementById('pvTitle').textContent = document.getElementById('bTitle').value || 'Post Title';
+  document.getElementById('pvMeta').textContent = `By ${document.getElementById('bAuthor').value || 'Admin'} · ${new Date().toLocaleDateString()}`;
+  document.getElementById('pvContent').innerHTML = quill.root.innerHTML;
+}
+
+async function openBlogModal(blog) {
   editBlogId = blog?.id||null;
   document.getElementById('blogModalTitle').textContent = blog?'Edit Blog Post':'Add Blog Post';
   document.getElementById('bTitle').value   = blog?.title||'';
@@ -573,28 +670,54 @@ function openBlogModal(blog) {
   document.getElementById('bAuthor').value  = blog?.author||'';
   document.getElementById('bTags').value    = blog?.tags||'';
   document.getElementById('bExcerpt').value = blog?.excerpt||'';
-  document.getElementById('bContent').value = blog?.content||'';
+  
+  document.getElementById('blogModal').classList.add('on');
+  
+  // Ensure the editor container is initialized
+  if (!quill) {
+     quill = new Quill('#bContentEditor', {
+        theme: 'snow',
+        modules: {
+          toolbar: [
+            [{ 'header': [1, 2, false] }],
+            ['bold', 'italic', 'underline'],
+            ['link', 'image'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['clean']
+          ]
+        }
+      });
+      quill.on('text-change', function() {
+        if (document.getElementById('blogModal').classList.contains('preview-active')) updatePreview();
+      });
+  }
+  
+  // Set content safely
+  quill.root.innerHTML = blog?.content || '';
+  
   document.getElementById('bPublished').checked = blog?.published||false;
   document.getElementById('bBanner').value  = '';
   const prev = document.getElementById('bBannerPreview');
   if (blog?.banner_url) { prev.src=blog.banner_url; prev.classList.add('on'); }
   else { prev.src=''; prev.classList.remove('on'); }
-  document.getElementById('blogModal').classList.add('on');
-  setTimeout(()=>document.getElementById('bTitle').focus(),50);
+  setTimeout(()=>document.getElementById('bTitle').focus(),250);
 }
-function closeBlogModal() { document.getElementById('blogModal').classList.remove('on'); }
-function editBlog(id) { openBlogModal(allBlogs.find(b=>b.id===id)); }
 
-function previewBanner(input) {
-  const prev = document.getElementById('bBannerPreview');
-  if (input.files?.[0]) { const r=new FileReader(); r.onload=e=>{prev.src=e.target.result;prev.classList.add('on');}; r.readAsDataURL(input.files[0]); }
-  else { prev.src=''; prev.classList.remove('on'); }
+function closeBlogModal() {
+  document.getElementById('blogModal').classList.remove('on');
+  document.getElementById('blogModal').classList.remove('preview-active');
+  document.getElementById('btnBlogPreview').textContent = 'Live Preview';
+  if(quill) quill.root.innerHTML = '';
 }
 
 async function saveBlog() {
   const btn = document.getElementById('btnSaveBlog');
-  const title=document.getElementById('bTitle').value.trim(), slug=document.getElementById('bSlug').value.trim(), content=document.getElementById('bContent').value.trim();
-  if (!title||!slug||!content) { toast('Title, slug and content are required','err'); return; }
+  const title=document.getElementById('bTitle').value.trim(), 
+        slug=document.getElementById('bSlug').value.trim(), 
+        content=quill.root.innerHTML;
+  
+  if (!title||!slug||!quill.getText().trim()) { toast('Title, slug and content are required','err'); return; }
+  
   btn.classList.add('busy'); btn.textContent = editBlogId?'Saving…':'Publishing…';
   const pub = document.getElementById('bPublished').checked;
   const fd = new FormData();
@@ -603,13 +726,14 @@ async function saveBlog() {
   fd.append('tags',document.getElementById('bTags').value.trim());
   fd.append('excerpt',document.getElementById('bExcerpt').value.trim());
   fd.append('content',content); fd.append('published',pub?'true':'false');
+  
   const bannerFile = document.getElementById('bBanner').files[0];
   if (bannerFile) fd.append('banner',bannerFile);
+  
   try {
     const r = await api(editBlogId?`/admin/api/blogs/${editBlogId}`:'/admin/api/blogs', { method:editBlogId?'PUT':'POST', body:fd });
     if (!r.ok) throw new Error(await r.text());
-    const res = await r.json();
-    // Reload all blogs from server so banner_url reflects the real PocketBase file URL
+    
     allBlogs = await (await api('/admin/api/blogs')).json();
     document.getElementById('mBlogs').textContent = allBlogs.length;
     renderBlogs(allBlogs);

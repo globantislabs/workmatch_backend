@@ -8,23 +8,13 @@ from typing import Optional
 
 app = FastAPI()
 
-# CORS configuration - properly configured for production
+# CORS configuration - properly configured for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://theworkmatch.com",
-        "https://www.theworkmatch.com",
-        "https://admin.theworkmatch.com",
-        "http://localhost",
-        "http://localhost:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
 )
 security = HTTPBearer()
 PB_URL = os.getenv("POCKETBASE_URL", "http://127.0.0.1:8090")
@@ -318,6 +308,17 @@ async def get_job(job_id: str):
     r = await http().get(f"/api/collections/hire_developer/records/{job_id}")
     if r.status_code == 404: raise HTTPException(404, "Job not found")
     return _fmt_job(r.json())
+
+@app.get("/api/jobs/name/{job_title}")
+async def get_job_by_title(job_title: str):
+    """Fetch a job by its title"""
+    # URL encode the title for the filter if needed, but PocketBase filter handles strings
+    r = await http().get("/api/collections/hire_developer/records", 
+                         params={"filter": f'job_title="{job_title}"', "perPage": 1})
+    results = items(r.json())
+    if not results:
+        raise HTTPException(404, "Job not found")
+    return _fmt_job(results[0])
 
 @app.get("/admin/api/jobs")
 async def admin_list_jobs(user: dict = Depends(verify_token)):

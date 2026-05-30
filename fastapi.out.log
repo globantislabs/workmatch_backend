@@ -1,0 +1,46 @@
+INFO:     127.0.0.1:63481 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54618 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54618 - "GET /admin/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54618 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64008 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:61299 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63072 - "GET /admin/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63072 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51822 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:59124 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:59126 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61161 - "GET /admin/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61185 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61185 - "GET /admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61193 - "GET /admin/api/hire-talent HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61195 - "GET /admin/api/blogs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61192 - "GET /admin/api/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61194 - "GET /admin/api/jobs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61185 - "GET /admin/api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54519 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59049 - "GET /admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /admin/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52921 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50918 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50060 - "GET /admin/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53220 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53220 - "GET /admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59563 - "GET /admin/api/blogs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59210 - "GET /admin/api/jobs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65048 - "GET /admin/api/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53286 - "GET /admin/api/hire-talent HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57054 - "GET /admin/api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56133 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:52178 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53910 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53917 - "GET /admin/api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55491 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55491 - "GET /admin/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55491 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63579 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63579 - "GET /admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63579 - "GET /admin/api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49666 - "GET /admin/api/applications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63579 - "GET /admin/api/hire-talent HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49666 - "GET /admin/api/jobs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63579 - "GET /admin/api/blogs HTTP/1.1" 200 OK
