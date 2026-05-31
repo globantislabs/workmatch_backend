@@ -18,9 +18,8 @@ server {
 
 # HTTPS — serve frontend
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    http2 on;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name theworkmatch.com www.theworkmatch.com;
 
     ssl_certificate     /etc/letsencrypt/live/theworkmatch.com/fullchain.pem;
@@ -70,9 +69,8 @@ server {
 
 # HTTPS — proxy to FastAPI
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    http2 on;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name admin.theworkmatch.com;
 
     ssl_certificate     /etc/letsencrypt/live/admin.theworkmatch.com-0001/fullchain.pem;
