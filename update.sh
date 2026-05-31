@@ -12,6 +12,10 @@ GREEN='\033[0;32m'; CYAN='\033[0;36m'; NC='\033[0m'
 log()  { echo -e "${GREEN}[✔]${NC} $1"; }
 info() { echo -e "${CYAN}[→]${NC} $1"; }
 
+# Fix git safe directory for sudo
+sudo git config --global --add safe.directory "$FRONTEND_DIR" 2>/dev/null || true
+sudo git config --global --add safe.directory "$BACKEND_DIR"  2>/dev/null || true
+
 echo ""
 echo "============================================================"
 echo "   WorkMatch — Quick Update"

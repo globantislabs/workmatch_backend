@@ -93,6 +93,11 @@ sudo mkdir -p "$BACKEND_DIR"
 sudo git clone "$BACKEND_REPO" "$BACKEND_DIR"
 log "Backend cloned → $BACKEND_DIR"
 
+# Fix git safe directory so future sudo git pulls work
+sudo git config --global --add safe.directory "$FRONTEND_DIR" 2>/dev/null || true
+sudo git config --global --add safe.directory "$BACKEND_DIR"  2>/dev/null || true
+log "Git safe directories configured"
+
 # ── STEP 6: Python virtual environment & dependencies ────────────────────────
 info "Setting up Python virtual environment..."
 
