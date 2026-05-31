@@ -224,34 +224,12 @@ log "FastAPI service created"
 
 # ── STEP 13: Nginx config — Frontend (theworkmatch.com) ──────────────────────
 info "Writing Nginx config for frontend..."
-info "Writing Nginx config for frontend..."
 sudo tee /etc/nginx/sites-available/workmatch_frontend > /dev/null <<EOF
-# ── HTTP → HTTPS redirect ────────────────────────────────────────────────────
+# HTTP only — certbot will upgrade this to HTTPS automatically
 server {
     listen 80;
     listen [::]:80;
     server_name ${DOMAIN_FRONTEND} www.${DOMAIN_FRONTEND};
-    return 301 https://\$host\$request_uri;
-}
-
-# ── HTTPS — Frontend ─────────────────────────────────────────────────────────
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name ${DOMAIN_FRONTEND} www.${DOMAIN_FRONTEND};
-
-    # SSL — filled in by certbot
-    ssl_certificate     /etc/letsencrypt/live/${DOMAIN_FRONTEND}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_FRONTEND}/privkey.pem;
-    include             /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
-
-    # Security headers
-    add_header X-Frame-Options        "SAMEORIGIN"  always;
-    add_header X-Content-Type-Options "nosniff"     always;
-    add_header X-XSS-Protection       "1; mode=block" always;
-    add_header Referrer-Policy        "strict-origin-when-cross-origin" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 
     root  ${FRONTEND_DIR};
     index index.html;
@@ -284,34 +262,14 @@ server {
 EOF
 log "Frontend Nginx config written"
 
-# ── STEP 15: Nginx config — Backend (admin.theworkmatch.com) ─────────────────
+# ── STEP 14: Nginx config — Backend (admin.theworkmatch.com) ─────────────────
 info "Writing Nginx config for backend/admin..."
 sudo tee /etc/nginx/sites-available/workmatch_backend > /dev/null <<EOF
-# ── HTTP → HTTPS redirect ────────────────────────────────────────────────────
+# HTTP only — certbot will upgrade this to HTTPS automatically
 server {
     listen 80;
     listen [::]:80;
     server_name ${DOMAIN_BACKEND};
-    return 301 https://\$host\$request_uri;
-}
-
-# ── HTTPS — Backend / Admin ──────────────────────────────────────────────────
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name ${DOMAIN_BACKEND};
-
-    # SSL — filled in by certbot
-    ssl_certificate     /etc/letsencrypt/live/${DOMAIN_BACKEND}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_BACKEND}/privkey.pem;
-    include             /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
-
-    # Security headers
-    add_header X-Frame-Options        "SAMEORIGIN"  always;
-    add_header X-Content-Type-Options "nosniff"     always;
-    add_header X-XSS-Protection       "1; mode=block" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     client_max_body_size 20M;
 
@@ -351,7 +309,7 @@ server {
 EOF
 log "Backend Nginx config written"
 
-# ── STEP 16: Enable Nginx sites ───────────────────────────────────────────────
+# ── STEP 15: Enable Nginx sites ───────────────────────────────────────────────
 info "Enabling Nginx sites..."
 sudo ln -sf /etc/nginx/sites-available/workmatch_frontend /etc/nginx/sites-enabled/workmatch_frontend
 sudo ln -sf /etc/nginx/sites-available/workmatch_backend  /etc/nginx/sites-enabled/workmatch_backend
@@ -393,23 +351,25 @@ else
     err "FastAPI failed to start — run: sudo journalctl -u workmatch_backend -n 50"
 fi
 
-# ── STEP 20: Reload Nginx ─────────────────────────────────────────────────────
+# ── STEP 19: Reload Nginx ────────────────────────────────────────────────────
 info "Reloading Nginx..."
 sudo systemctl reload nginx
 log "Nginx reloaded"
 
-# ── STEP 21: SSL certificates ─────────────────────────────────────────────────
-echo ""
-warn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-warn " SSL SETUP — Run these two commands manually after this script:"
-warn ""
-warn "   sudo certbot --nginx -d ${DOMAIN_FRONTEND} -d www.${DOMAIN_FRONTEND}"
-warn "   sudo certbot --nginx -d ${DOMAIN_BACKEND}"
-warn ""
-warn " Then reload nginx:"
-warn "   sudo systemctl reload nginx"
-warn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
+# ── STEP 20: SSL certificates via certbot ────────────────────────────────────
+info "Obtaining SSL certificates via certbot..."
+sudo certbot --nginx --non-interactive --agree-tos --redirect \
+    -m "admin@${DOMAIN_FRONTEND}" \
+    -d "${DOMAIN_FRONTEND}" -d "www.${DOMAIN_FRONTEND}" || \
+    warn "Certbot failed for ${DOMAIN_FRONTEND} — run manually: sudo certbot --nginx -d ${DOMAIN_FRONTEND} -d www.${DOMAIN_FRONTEND}"
+
+sudo certbot --nginx --non-interactive --agree-tos --redirect \
+    -m "admin@${DOMAIN_FRONTEND}" \
+    -d "${DOMAIN_BACKEND}" || \
+    warn "Certbot failed for ${DOMAIN_BACKEND} — run manually: sudo certbot --nginx -d ${DOMAIN_BACKEND}"
+
+sudo systemctl reload nginx
+log "SSL certificates installed and Nginx reloaded"
 
 # ── DONE ──────────────────────────────────────────────────────────────────────
 echo ""
@@ -417,8 +377,8 @@ echo "============================================================"
 echo -e "${GREEN}   ✔  Fresh deployment complete!${NC}"
 echo "============================================================"
 echo ""
-echo "  Frontend  → http://${DOMAIN_FRONTEND}  (HTTPS after certbot)"
-echo "  Admin     → http://${DOMAIN_BACKEND}   (HTTPS after certbot)"
+echo "  Frontend  → https://${DOMAIN_FRONTEND}"
+echo "  Admin     → https://${DOMAIN_BACKEND}"
 echo ""
 echo "  Service status:"
 echo "    sudo systemctl status workmatch_pocketbase"
