@@ -7,8 +7,8 @@
 set -euo pipefail
 
 # ── CONFIGURATION — edit these before running ────────────────────────────────
-FRONTEND_REPO="https://github.com/YOUR_ORG/workmatch_frontend.git"
-BACKEND_REPO="https://github.com/YOUR_ORG/workmatch_backend.git"
+FRONTEND_REPO="https://github.com/globantislabs/workmatch_frontend.git"
+BACKEND_REPO="https://github.com/globantislabs/workmatch_backend.git"
 
 FRONTEND_DIR="/var/www/workmatch_frontend"
 BACKEND_DIR="/opt/workmatch_backend"
