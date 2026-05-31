@@ -190,6 +190,22 @@ log "PocketBase service created"
 
 # ── STEP 12: Systemd — FastAPI service ───────────────────────────────────────
 info "Creating FastAPI systemd service..."
+
+# Verify gunicorn exists before writing service
+if [ ! -f "${BACKEND_DIR}/.venv/bin/gunicorn" ]; then
+    warn "gunicorn not found, installing..."
+    sudo "${BACKEND_DIR}/.venv/bin/pip" install gunicorn -q
+fi
+
+# Verify uvicorn exists
+if [ ! -f "${BACKEND_DIR}/.venv/bin/uvicorn" ]; then
+    warn "uvicorn not found, installing..."
+    sudo "${BACKEND_DIR}/.venv/bin/pip" install "uvicorn[standard]" -q
+fi
+
+GUNICORN_BIN="${BACKEND_DIR}/.venv/bin/gunicorn"
+log "Using gunicorn at: ${GUNICORN_BIN}"
+
 sudo tee /etc/systemd/system/workmatch_backend.service > /dev/null <<EOF
 [Unit]
 Description=WorkMatch FastAPI Backend
@@ -203,14 +219,7 @@ User=www-data
 Group=www-data
 WorkingDirectory=${BACKEND_DIR}
 EnvironmentFile=${BACKEND_DIR}/.env
-ExecStart=${BACKEND_DIR}/.venv/bin/gunicorn \
-    -w 4 \
-    -k uvicorn.workers.UvicornWorker \
-    main:app \
-    --bind 127.0.0.1:${FASTAPI_PORT} \
-    --timeout 120 \
-    --access-logfile /var/log/workmatch_fastapi_access.log \
-    --error-logfile /var/log/workmatch_fastapi_error.log
+ExecStart=${BACKEND_DIR}/.venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 127.0.0.1:${FASTAPI_PORT} --timeout 120
 Restart=always
 RestartSec=5
 StandardOutput=journal
