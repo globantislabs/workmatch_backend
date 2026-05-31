@@ -267,6 +267,11 @@ server {
         rewrite ^/career-detail/(.+)$ /career-details.html?name=\$1 last;
     }
 
+    # Clean URLs for pages without .html
+    location = /careers {
+        rewrite ^ /careers.html last;
+    }
+
     access_log /var/log/nginx/workmatch_frontend_access.log;
     error_log  /var/log/nginx/workmatch_frontend_error.log;
 }
