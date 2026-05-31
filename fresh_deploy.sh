@@ -262,9 +262,9 @@ server {
         try_files \$uri \$uri.html \$uri/ =404;
     }
 
-    # Career detail clean URL
-    location /career-detail/ {
-        rewrite ^/career-detail/(.*)$ /career-details.html?name=\$1 last;
+    # Career detail clean URL — regex location preserves full encoded title
+    location ~ ^/career-detail/(.+)$ {
+        rewrite ^/career-detail/(.+)$ /career-details.html?name=\$1 last;
     }
 
     access_log /var/log/nginx/workmatch_frontend_access.log;
