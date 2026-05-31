@@ -710,6 +710,8 @@ function closeBlogModal() {
   if(quill) quill.root.innerHTML = '';
 }
 
+function editBlog(id) { openBlogModal(allBlogs.find(b => b.id === id)); }
+
 async function saveBlog() {
   const btn = document.getElementById('btnSaveBlog');
   const title=document.getElementById('bTitle').value.trim(), 
