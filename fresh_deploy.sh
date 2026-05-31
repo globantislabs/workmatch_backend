@@ -159,6 +159,8 @@ sudo find "$FRONTEND_DIR" -type d -exec chmod 755 {} \;
 sudo find "$FRONTEND_DIR" -type f -exec chmod 644 {} \;
 sudo find "$BACKEND_DIR"  -type d -exec chmod 755 {} \;
 sudo find "$BACKEND_DIR"  -type f -exec chmod 644 {} \;
+# Restore execute bits on venv binaries and pocketbase (chmod 644 above strips them)
+sudo chmod +x "$BACKEND_DIR/.venv/bin/"*
 sudo chmod +x "$BACKEND_DIR/pocketbase"
 sudo chmod 600 "$BACKEND_DIR/.env"
 log "Permissions set"
