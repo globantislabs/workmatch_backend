@@ -17,7 +17,7 @@ DOMAIN_FRONTEND="theworkmatch.com"          # main site
 DOMAIN_BACKEND="admin.theworkmatch.com"     # admin / API
 
 PB_ADMIN_EMAIL="admin@workmatch.com"
-PB_ADMIN_PASSWORD="ChangeMe_Strong_Pass_123"   # CHANGE THIS
+PB_ADMIN_PASSWORD="admin123456"   # CHANGE THIS
 
 FASTAPI_PORT=8000
 POCKETBASE_PORT=8090
@@ -95,8 +95,23 @@ log "Backend cloned → $BACKEND_DIR"
 
 # ── STEP 6: Python virtual environment & dependencies ────────────────────────
 info "Setting up Python virtual environment..."
+
+# Ensure python3-venv is installed
+sudo apt-get install -y -qq python3-venv python3-pip
+
+# Remove any broken venv from previous run
+sudo rm -rf "$BACKEND_DIR/.venv"
+
+# Create fresh venv
 sudo python3 -m venv "$BACKEND_DIR/.venv"
+
+# Verify venv was created
+if [ ! -f "$BACKEND_DIR/.venv/bin/pip" ]; then
+    err "venv creation failed — pip not found at $BACKEND_DIR/.venv/bin/pip"
+fi
+
 sudo "$BACKEND_DIR/.venv/bin/pip" install --upgrade pip -q
+sudo "$BACKEND_DIR/.venv/bin/pip" install gunicorn -q
 sudo "$BACKEND_DIR/.venv/bin/pip" install -r "$BACKEND_DIR/requirements.txt" -q
 log "Python dependencies installed"
 
@@ -207,12 +222,8 @@ WantedBy=multi-user.target
 EOF
 log "FastAPI service created"
 
-# ── STEP 13: Install gunicorn ─────────────────────────────────────────────────
-info "Installing gunicorn..."
-sudo "$BACKEND_DIR/.venv/bin/pip" install gunicorn -q
-log "Gunicorn installed"
-
-# ── STEP 14: Nginx config — Frontend (theworkmatch.com) ──────────────────────
+# ── STEP 13: Nginx config — Frontend (theworkmatch.com) ──────────────────────
+info "Writing Nginx config for frontend..."
 info "Writing Nginx config for frontend..."
 sudo tee /etc/nginx/sites-available/workmatch_frontend > /dev/null <<EOF
 # ── HTTP → HTTPS redirect ────────────────────────────────────────────────────
